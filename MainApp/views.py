@@ -1,7 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
 from .models import Topic, Entry
 from .forms import TopicForm, EntryForm
-from django.shortcuts import redirect
 
 # Create your views here.
 
@@ -9,6 +9,7 @@ def index(request):
     '''The home page for learning log.'''
     return render(request, 'MainApp/index.html')
 
+@login_required
 def topics(request):
     # ascending order if you want descending order add '-' in front 
     # of date_added
@@ -16,13 +17,15 @@ def topics(request):
     context = {'topics':topics}
     return render(request, 'MainApp/topics.html', context)
 
+@login_required
 def topic(request, topic_id):
     topic = Topic.objects.get(id=topic_id)
     entries = topic.entry_set.order_by('-date_added')
 
     context = {'topic': topic, 'entries': entries}
     return render(request, 'MainApp/topic.html', context)
-    
+
+@login_required   
 def new_topic(request):
     if request.method != 'POST':
         form = TopicForm()
@@ -36,6 +39,7 @@ def new_topic(request):
     context = {'form': form}
     return render(request, 'MainApp/new_topic.html', context)
 
+@login_required
 def new_entry(request, topic_id):
     topic = Topic.objects.get(id=topic_id)
 
@@ -52,6 +56,7 @@ def new_entry(request, topic_id):
     context = {'form': form, 'topic': topic}
     return render(request, 'MainApp/new_entry.html', context)
 
+@login_required
 def edit_entry(request, entry_id):
     entry = Entry.objects.get(id=entry_id)
     topic = entry.topic 
